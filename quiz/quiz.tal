@@ -34,31 +34,35 @@
 
 @on-controller ( -> )
     .Controller/key DEI
-    ( DUP #18 DEO )
-
     LIT "( #18 DEO
     DUP #18 DEO
     LIT ") #18 DEO
 
-    DUP 
+    DUP #08 EQU ,&delete JCN ( backspace )
+    ,&add JMP
 
     &add
+        LIT "a #18 DEO
         ;buffer ;buffer-append JSR2
-    BRK
+    ,&redraw JMP
 
     &delete
+        POP
+        LIT "d #18 DEO
         ;buffer ;buffer-pop JSR2
-    BRK
+    ,&redraw JMP
     
-    ;empty-buffer-draw JSR2
-    ;buffer-draw JSR2
+    &redraw
+        ;empty-buffer-draw JSR2
+        ;buffer-draw JSR2
 BRK
 
 @buffer "Eswati $32
 @empty-buffer "__________________________________________________
 @key-entry-indicator "_ $1
 
-@empty-buffer-draw
+@empty-buffer-draw ( -- )
+    LIT "e #18 DEO
 	#02 ;draw-chr/color STA
     #002a .Screen/y DEO2
     #001b .Screen/x DEO2
@@ -114,6 +118,11 @@ JMP2r
 
 ( assets )
 ~africa.tal
+
+@countries
+    LIT "Eswatini #00
+    LIT "Lesotho #00
+    LIT "Botswana #00
 
 @font ( atari8 )
 0000 0000 0000 0000 6060 6060 6000 6000

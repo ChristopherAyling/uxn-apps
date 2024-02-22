@@ -1,0 +1,166 @@
+( quiz.tal )
+
+|00 @System  [ &vector $2 &pad $6  &r $2 &g $2 &b $2 ]
+|10 @Console [ &vecotr $2 &read $1 &pad $5 &write $1 &error $1 ]
+|20 @Screen  [ &vector $2 &width $2 &height $2 &auto $1 &pad $1 &x $2 &y $2 &addr $2 &pixel $1 &sprite $1 ]
+|80 @Controller [ &vector $2 &button $1 &key $1 ]
+
+( main )
+|0100
+    ( color scheme )
+    #91c7 .System/r DEO2
+    #55f4 .System/g DEO2
+    #87d5 .System/b DEO2
+
+	#02 ;draw-chr/color STA
+
+    #0008 .Screen/y DEO2
+    #0008 .Screen/x DEO2
+    ;text/title ;draw-str JSR2
+
+    #001d .Screen/y DEO2
+    #001b .Screen/x DEO2
+    ;text/prompt ;draw-str JSR2
+
+    ( ;buffer ;draw-str JSR2 )
+
+    ( LIT "Y ;buffer ;buffer-append JSR2 )
+    ( ;buffer ;draw-str JSR2 )
+    ;buffer-draw JSR2
+
+    ;on-controller .Controller/vector DEO2
+
+( functions )
+
+@on-controller ( -> )
+    .Controller/key DEI
+    ( DUP #18 DEO )
+
+    LIT "( #18 DEO
+    DUP #18 DEO
+    LIT ") #18 DEO
+
+    DUP 
+
+    &add
+        ;buffer ;buffer-append JSR2
+    BRK
+
+    &delete
+        ;buffer ;buffer-pop JSR2
+    BRK
+    
+    ;empty-buffer-draw JSR2
+    ;buffer-draw JSR2
+BRK
+
+@buffer "Eswati $32
+@empty-buffer "__________________________________________________
+@key-entry-indicator "_ $1
+
+@empty-buffer-draw
+	#02 ;draw-chr/color STA
+    #002a .Screen/y DEO2
+    #001b .Screen/x DEO2
+    ;empty-buffer-draw ;draw-str JSR2
+JMP2r
+
+@buffer-draw
+	#02 ;draw-chr/color STA
+    #002a .Screen/y DEO2
+    #001b .Screen/x DEO2
+    ;buffer ;draw-str JSR2
+	#01 ;draw-chr/color STA
+    ;key-entry-indicator ;draw-str JSR2
+JMP2r
+
+@buffer-end ( str* -- end* )
+    LDAk #00 EQU ,&skip JCN
+    &while INC2 LDAk ,&while JCN
+    &skip
+JMP2r
+
+@buffer-len ( str* -- len )
+    DUP2 ;buffer-end JSR2 SWP2 SUB2
+JMP2r
+
+@buffer-append ( char str* -- )
+    ;buffer-end JSR2 STA
+JMP2r
+
+@buffer-pop ( str* -- )
+    #00 ROT ROT ;buffer-end JSR2 #0001 SUB2 STA
+JMP2r
+
+@text
+    &title "|COUNTRY 20 "QUIZ| #00
+    &prompt "Country 20 "Name: 20
+
+@draw-str ( str* -- str* )
+    ( skip if empty string )
+    LDAk #00 EQU ,&skip JCN
+	#01 .Screen/auto DEO
+    &while
+        LDAk ,draw-chr JSR
+        INC2 LDAk ,&while JCN
+    &skip
+    INC2
+JMP2r
+
+@draw-chr ( char -- )
+	#20 SUB #00 SWP #30 SFT2 ;font ADD2 .Screen/addr DEO2
+	[ LIT &color 03 ] .Screen/sprite DEO
+JMP2r
+
+( assets )
+~africa.tal
+
+@font ( atari8 )
+0000 0000 0000 0000 6060 6060 6000 6000
+6666 6600 0000 0000 006c fe6c 6cfe 6c00
+183e 603c 067c 1800 0066 6c18 3066 4600
+386c 3870 decc 7600 6060 6000 0000 0000
+1c30 3030 3030 1c00 380c 0c0c 0c0c 3800
+0066 3cff 3c66 0000 0018 187e 1818 0000
+0000 0000 0030 3060 0000 007e 0000 0000
+0000 0000 0018 1800 0306 0c18 3060 c000
+3c66 6e76 6666 3c00 1838 1818 1818 7e00
+3c66 060c 1830 7e00 7e0c 180c 0666 3c00
+0c1c 3c6c 7e0c 0c00 7e60 7c06 0666 3c00
+3c60 607c 6666 3c00 7e06 0c18 3030 3000
+3c66 663c 6666 3c00 3c66 663e 060c 3800
+0018 1800 0018 1800 0018 1800 1818 3000
+0c18 3060 3018 0c00 0000 7e00 007e 0000
+3018 0c06 0c18 3000 3c66 060c 1800 1800
+3c66 6e6a 6e60 3e00 183c 6666 7e66 6600
+7c66 667c 6666 7c00 3c66 6060 6066 3c00
+786c 6666 666c 7800 7e60 607c 6060 7e00
+7e60 607c 6060 6000 3e60 606e 6666 3e00
+6666 667e 6666 6600 3c18 1818 1818 3c00
+3e06 0606 0666 3c00 666c 7870 786c 6600
+6060 6060 6060 7e00 c6ee fed6 c6c6 c600
+6676 7e7e 6e66 6600 3c66 6666 6666 3c00
+7c66 667c 6060 6000 3c66 6666 766c 3600
+7c66 667c 6c66 6600 3c66 603c 0666 3c00
+7e18 1818 1818 1800 6666 6666 6666 3e00
+6666 6666 663c 1800 c6c6 c6d6 feee c600
+6666 3c18 3c66 6600 6666 663c 1818 1800
+7e06 0c18 3060 7e00 3c30 3030 3030 3c00
+c060 3018 0c06 0300 3c0c 0c0c 0c0c 3c00
+1038 6cc6 0000 0000 0000 0000 0000 fe00
+0060 3018 0000 0000 0000 3c06 3e66 3e00
+6060 7c66 6666 7c00 0000 3c60 6060 3c00
+0606 3e66 6666 3e00 0000 3c66 7e60 3c00
+1c30 7c30 3030 3000 0000 3e66 663e 067c
+6060 7c66 6666 6600 1800 3818 1818 3c00
+1800 1818 1818 1870 6060 666c 786c 6600
+3818 1818 1818 3c00 0000 ecfe d6c6 c600
+0000 7c66 6666 6600 0000 3c66 6666 3c00
+0000 7c66 6666 7c60 0000 3e66 6666 3e06
+0000 7c66 6060 6000 0000 3e60 3c06 7c00
+0018 7e18 1818 0e00 0000 6666 6666 3e00
+0000 6666 663c 1800 0000 c6c6 d67c 6c00
+0000 663c 183c 6600 0000 6666 663e 067c
+0000 7e0c 1830 7e00 1c30 3060 3030 1c00
+1818 1818 1818 1818 380c 0c06 0c0c 3800
+0000 60f2 9e0c 0000 3c42 9985 8599 423c

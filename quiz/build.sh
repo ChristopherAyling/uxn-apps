@@ -1,0 +1,1 @@
+uxnasm quiz.tal quiz.rom && uxnemu -2x quiz.rom
